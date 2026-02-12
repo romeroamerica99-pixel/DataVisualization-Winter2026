@@ -1,0 +1,137 @@
+---
+title: "America's Lab 6 Penguin Dashboard"
+runtime: shiny
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    theme: yeti
+    logo: penguin.png
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(plotly)
+library(ggplot2)
+library(ggplot2)
+library(here)
+library(rio)
+library(tidyverse)
+library(rscorecard)
+library(scales)
+library(viridis)
+library(palmerpenguins)
+library(RColorBrewer)
+library(colorspace)
+library(ggrepel)
+library(gghighlight)
+library(colorblindr)
+data(penguins)
+```
+# Penguins!!!
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Bill Length & Depth
+> Bill length and bill depth vary as a function of species. 
+
+```{r}
+plot_1 <- ggplot(penguins, aes(x = bill_length_mm, y = bill_depth_mm, group = species, color = species, fill = species)) +
+  ylim(12.5, 22.5) +
+  xlim(30, 60) +
+  geom_point(data = penguins, 
+             aes(x = bill_length_mm, y = bill_depth_mm),
+             alpha = 0.7, 
+             size = 2) +
+  theme_classic(base_size = 20) +
+  scale_color_brewer(palette = "Set2") +
+  labs(
+    x = "Bill Length",
+    y = "Bill Depth")
+plot_1
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Body Mass by Island
+
+```{r}
+plot <- ggplot(penguins, aes(x = island, y = body_mass_g, color = island)) +
+  ylim(2000, 7000) +
+  geom_boxplot() +
+  theme_classic(base_size = 20) +
+  scale_color_brewer(palette = "Dark2") +
+  labs(
+    x = "Island",
+    y = "Body Mass (g)")
+
+plot
+```
+
+### Mean Body by Sex and Species
+
+```{r, fig.width=10, fig.height=8}
+penguin_summary <- penguins %>%
+  drop_na(sex) %>%
+  group_by(species, sex) %>%
+  summarize(mean_mass = mean(body_mass_g), .groups = "drop")
+
+
+ggplot(penguin_summary, aes(x = sex, y = species, fill = mean_mass)) +
+  geom_tile(color = "white", linewidth = 0.8) +
+  geom_text(aes(label = round(mean_mass, 0)), size = 5) +
+  scale_fill_distiller(palette = "RdBu", direction = -1) +
+  labs(
+    x = "Sex",
+    y = "Species",
+    fill = "Mean body mass (g)"
+  ) +
+  theme_classic(base_size = 20)
+```
+
+Sidebar! {.sidebar}
+-----------------------------------------------------------------------
+Here is some sidebar text. 
+
+
+I am linking penguins from National Geographic to practice some link integration: check out the [**Gentoo Penguins**](https://www.nationalgeographic.com/animals/birds/facts/gentoo-penguin)!
+
+
+**Penguin Fun fact**: Did you know Gentoo penguins propose to their mates by presenting them with a perfect pebble.
+
+
+
+
+# Other non-penguin related things
+
+Column {.tabset}
+-----------------------------------------------------------------------
+### Plotly Chart!
+
+```{r}
+p <- ggplot(mpg, aes(displ, cty)) +
+geom_point() +
+geom_smooth() +
+theme_classic(base_size = 20)
+ggplotly(p)
+```
+
+### Another cool graph and this one is actually penguin related!
+
+```{r, fig.width=12, fig.height=8}
+q <- ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = bill_length_mm)) +
+  ylim(2000, 7000) +
+  geom_point(data = penguins, 
+             aes(x = flipper_length_mm, y = body_mass_g),
+             alpha = 0.7, 
+             size = 2) +
+  theme_classic(base_size = 20) +
+  scale_color_viridis_c(option = "inferno", name = "Bill Length (mm)") +
+  labs(
+    x = "Flipper Length",
+    y = "Body Mass (g)")
+
+q
+```
