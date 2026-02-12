@@ -1,6 +1,5 @@
 ---
 title: "America's Lab 6 Penguin Dashboard"
-runtime: shiny
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
